@@ -3,13 +3,20 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.send('Beatrite server is live!');
-});
+app.use('/device-data', express.text({ type: '*/*' }));
 
 app.post('/device-data', (req, res) => {
-  console.log('Received data:', req.body);
+  let data;
+  try {
+    data = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  } catch (err) {
+    console.log('Failed to parse JSON, using raw string.');
+    data = req.body;
+  }
+
+  console.log('Received data:', data);
   res.send({ status: 'ok' });
 });
 

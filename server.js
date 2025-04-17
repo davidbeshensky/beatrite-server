@@ -2,18 +2,19 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use('/device-data', express.text({ type: '*/*' }));
+// Use express.raw() for all content types (we'll try to parse manually)
+app.use('/device-data', express.raw({ type: '*/*' }));
 
 app.post('/device-data', (req, res) => {
   let data;
+
   try {
-    data = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    // Try parsing the raw buffer as JSON
+    const bodyString = req.body.toString('utf8');
+    data = JSON.parse(bodyString);
   } catch (err) {
-    console.log('Failed to parse JSON, using raw string.');
-    data = req.body;
+    console.log('Could not parse JSON:', err.message);
+    data = { error: 'Invalid JSON received', raw: req.body.toString('utf8') };
   }
 
   console.log('Received data:', data);

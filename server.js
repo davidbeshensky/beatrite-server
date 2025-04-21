@@ -7,6 +7,10 @@ app.use(bodyParser.json());
 
 app.use('/device-data', bodyParser.text({ type: '*/*' }));
 
+app.get('/', (req, res) => {
+    res.send('🚀 Beatrite Server is running!');
+  });
+
 app.post('/device-data', (req, res) => {
   let data;
 
